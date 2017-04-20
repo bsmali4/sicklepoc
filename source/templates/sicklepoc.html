@@ -1,0 +1,118 @@
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>sicklepoc扫描器</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen" />
+  <script src="js/jquery-3.1.0.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/echarts.js"></script>
+ </head>
+ <body>
+  <!--body开始-->
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <div class="row-fluid" style="background-color:#337AB7;background-image: url('images/header.png')">
+      <br />
+      <br />
+      <h1 class="text-center" style="font-size: 56px;color: #FFFFFF;text-shadow: -5px 5px 0 rgba(0,0,0,0.1);font-family: inherit;font-weight: 500;line-height: 1.1"> sicklepoc </h1>
+      <h4 class="text-center" style="color: #f4f4f4;margin-bottom: 15px;font-size: 47px;font-weight: 200;font-family: inherit;font-weight: 500;line-height: 1.1">sicklepoc扫描报告</h4>
+      <br />
+      <br />
+     </div>
+    </div>
+    <!-- table -->
+    <div class="row" style="margin-right: 0px;margin-left: 0px;">
+     <div class="col-md-12">
+      <table class="table table-striped">
+       <thead>
+        <tr>
+         <th>编号</th>
+         <th>主机</th>
+         <th>服务详情</th>
+         <th>插件详情</th>
+        </tr>
+       </thead>
+       <tbody>
+         {% for object in objects %}
+        <tr>
+         <th scope="row"></th>
+         {% if object['vuldetails']!= [] %}
+         <td><font size="4" face="arial" color="red">{{ object['host'] }}</font></td>
+         {% else %}
+         <td><font size="4" face="arial">{{ object['host'] }}</font></td>
+         {% endif %}
+         <td> <a href="" data-toggle="modal" data-target="#service{{ object['index'] }}">服务详情</a>
+          <!-- Modal -->
+          <div class="modal fade" id="service{{ object['index'] }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+           <div class="modal-dialog" role="document">
+            <div class="modal-content">
+             <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">服务详情</h4>
+             </div>
+             <div class="modal-body">
+              <table class="table table-striped">
+               <thead>
+                <tr>
+                 <th>端口</th>
+                 <th>服务</th>
+                </tr>
+               </thead>
+                  {% for portservice in object['portservices'] %}
+               <tbody>
+                <tr>
+                 <td>{{ portservice['port']}}</td>
+                 <td>{{ portservice['service']}}</td>
+                </tr>
+                {% endfor %}
+               </tbody>
+              </table>
+             </div>
+            </div>
+           </div>
+          </div>  </td>
+         <td>
+             <a href="" data-toggle="modal" data-target="#scan{{ object['index'] }}">扫描详情</a>
+          <!-- Modal -->
+          <div class="modal fade" id="scan{{ object['index'] }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+           <div class="modal-dialog" role="document">
+            <div class="modal-content">
+             <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">扫描详情</h4>
+             </div>
+             <div class="modal-body">
+              <table class="table table-striped">
+               <thead>
+                <tr>
+                 <th>信息</th>
+                 <th>插件</th>
+                </tr>
+               </thead>
+                  {% for vuldetail in object['vuldetails'] %}
+               <tbody>
+                <tr>
+                 <td>{{ vuldetail['info'] }}</td>
+                 <td><a href="plugins/{{ object['index'] }}{{ vuldetail['pluginname'] }}.html">插件详情</a></td>
+                </tr>
+                {% endfor %}
+               </tbody>
+              </table>
+             </div>
+            </div>
+           </div>
+          </div>
+         </td>
+        </tr> {% endfor %}
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <!-- table -->
+   </div>
+   <!--body结束-->
+  </div>
+ </body>
+</html>

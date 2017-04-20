@@ -1,0 +1,95 @@
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>sicklepoc扫描器</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen" />
+  <script src="../js/jquery-3.1.0.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  <script src="../js/echarts.js"></script>
+ </head>
+ <body>
+ <!--body开始-->
+ <div class="container-fluid">
+   <div class="row">
+     <div class="col-md-12">
+     <div class="row-fluid" style="background-color:#337AB7;background-image: url('../images/header.png')">
+     <br/>
+     <br/>
+     <h1 class="text-center" style="font-size: 56px;color: #FFFFFF;text-shadow: -5px 5px 0 rgba(0,0,0,0.1);font-family: inherit;font-weight: 500;line-height: 1.1"> sicklepoc </h1>
+     <h4 class="text-center" style="color: #f4f4f4;margin-bottom: 15px;font-size: 47px;font-weight: 200;font-family: inherit;font-weight: 500;line-height: 1.1">sicklepoc扫描报告</h4>
+     <br/>
+     <br/>
+    </div>
+   </div>
+   </div>
+
+
+   <div class="row">
+           <!--主页面，网站目录-->
+      <div class="col-md-12">
+        <div class="main">
+        <h1>插件详情</h1>
+        <!-- 名称start -->
+          <div class="panel panel-primary">
+            <div class="panel-heading">名称</div>
+            <div class="panel-body">
+              {{ plugindetails['name'] }}
+            </div>
+          </div>
+        <!-- 名称end -->
+        <!-- 问题路径start -->
+          <div class="panel panel-warning">
+            <div class="panel-heading">路径</div>
+            <div class="panel-body">
+             {{ plugindetails['target'] }}
+            </div>
+          </div>
+        <!-- 问题路径end -->
+        <!-- 影响版本start -->
+          <div class="panel panel-success">
+            <div class="panel-heading">影响版本</div>
+            <div class="panel-body">
+             {{ plugindetails['impversion'] }}
+            </div>
+          </div>
+        <!-- 影响版本end -->
+        <!-- 漏洞等级start -->
+          <div class="panel panel-info">
+            <div class="panel-heading">危害等级</div>
+            <div class="panel-body">
+              {{ plugindetails['level'] }}
+            </div>
+          </div>
+        <!-- 漏洞等级end -->
+        <!-- 漏洞分类start -->
+          <div class="panel panel-danger">
+            <div class="panel-heading">漏洞分类</div>
+            <div class="panel-body">
+              {{ plugindetails['type'] }}
+            </div>
+          </div>
+        <!-- 漏洞分类end -->
+        <!-- 漏洞描述start -->
+        <div class="panel panel-warning">
+            <div class="panel-heading">漏洞描述</div>
+            <div class="panel-body">
+              {{ plugindetails['description'] }}
+            </div>
+          </div>
+        <!-- 漏洞描述end-->
+        <!-- 修复建议start -->
+        <div class="panel panel-success">
+            <div class="panel-heading">修复建议</div>
+            <div class="panel-body">
+               {{ plugindetails['repair'] }}
+            </div>
+          </div>
+        <!-- 修复建议end-->
+        </div>
+      </div>
+   </div>
+  </div>
+ <!--body结束-->
+ </body>
+</html>
