@@ -18,18 +18,18 @@ from common.exception.sickle_poc_exception import LevelError
 from common.util import crypto
 
 
-def main(targets, plugins, level, debug):
+def main(targets, plugins, level, debug, headers):
     delete_cache()
     if not (isinstance(level, int) and level > 0 and level < 5):
         raise LevelError()
     level = config.get_cpu_count() * level
-    scan(targets, plugins, int(level), debug)
+    scan(targets, plugins, int(level), debug, headers)
 
 
-def scan(targets, plugins, level, debug):
+def scan(targets, plugins, level, debug, headers):
     canceled = False
     jobqueue = multiprocessing.JoinableQueue()
-    create_process(level, jobqueue, plugins, debug)
+    create_process(level, jobqueue, plugins, debug, headers)
     add_job(targets, jobqueue)
     try:
         jobqueue.join()
@@ -44,28 +44,28 @@ def add_job(targets, jobqueue):
         jobqueue.put(target)
 
 
-def create_process(level, jobqueue, plugins, debug):
+def create_process(level, jobqueue, plugins, debug, headers):
     for _ in range(level):
-        process = multiprocessing.Process(target=worker, args=(jobqueue, plugins, debug))
+        process = multiprocessing.Process(target=worker, args=(jobqueue, plugins, debug, headers))
         process.daemon = True
         process.start()
 
 
-def worker(jobqueue, plugins, debug):
+def worker(jobqueue, plugins, debug, headers):
     while True:
         try:
             target = jobqueue.get()
-            gevent_scan_task(target, plugins, debug)
+            gevent_scan_task(target, plugins, debug, headers)
         except Exception, e:
             print traceback.format_exc()
         finally:
             jobqueue.task_done()
 
 
-def gevent_scan_task(target, plugins, debug):
+def gevent_scan_task(target, plugins, debug, headers):
     evt = Event()
     pool = []
-    scanmodle = ScanModle(target, plugins, debug)
+    scanmodle = ScanModle(target, plugins, debug, headers)
     pool.append(gevent.spawn(scanmodle.scan_port(evt)))
     pool.append(gevent.spawn(scanmodle.scan_plugins(evt)))
     for port in scanmodle.get_ports():
@@ -110,7 +110,7 @@ def delete_cache():
         os.remove(filepath)
 
 class ScanModle(object):
-    def __init__(self, hostip, plugins, debug):
+    def __init__(self, hostip, plugins, debug, headers):
         global results
         self.__debug = debug
         self.__host_ip = hostip
@@ -118,6 +118,7 @@ class ScanModle(object):
         self.__plugins = plugins
         self.__port_services = []
         self.__results = []
+        self.__headers = headers
 
     def get_results(self):
         return self.__results
@@ -160,10 +161,12 @@ class ScanModle(object):
         evt.wait()
         for plugin in self.__plugins:
             plugin.options['host'] = self.__host_ip
+            plugin.options['headers'] = self.__headers
             if port:
                 plugin.options['port'] = port
             result = plugin.verify(False)
+            plugin.init_options()
             if self.__debug:
                 print result
-            if result['status'] == True and self.__results.count(result) == 0:
+            if result['status'] is True and self.__results.count(result) == 0:
                 self.__results.append(result)

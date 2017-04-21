@@ -4,7 +4,7 @@ import argparse
 sys.path.append("../..")
 import requests
 from sickle_poc_frame import base_sickle_poc
-from common.util.string_inject_dic import strInjectDic, stringToDic, dicToString
+from common.util.string_inject_dic import dic_to_string, string_to_dic, str_inject_dic
 from common.exception.sickle_poc_exception import SicklePocInfoWrong
 from common.exception.sickle_poc_exception import SicklePocOptionsWrong
 
@@ -42,7 +42,7 @@ class SicklePoc(base_sickle_poc.BaseSicklePoc):
         args = (use_parser == True and self.help() or argparse.Namespace(target=None, port=None, headers=None))
         target = (args.target == None and self.options['host'] or args.target)
         port = (args.port == None and self.options['port'] or args.port)
-        headers = (args.headers == None and {} or args.headers)
+        headers = (args.headers == None and self.options['headers'] or args.headers)
         if port != 443:
             target = "http://" + target + ":" + str(port)
         else:
@@ -65,7 +65,6 @@ class SicklePoc(base_sickle_poc.BaseSicklePoc):
             if req is not None:
                 req.close()
                 del req
-        self.init_options()
         return result
 
     def help(self):

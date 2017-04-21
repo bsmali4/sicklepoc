@@ -59,7 +59,6 @@ class SicklePoc(base_sickle_poc.BaseSicklePoc):
             if redisSocket:
                 redisSocket.close()
                 del redisSocket
-        self.init_options()
         return result
 
     def help(self):

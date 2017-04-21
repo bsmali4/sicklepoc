@@ -8,7 +8,7 @@ import traceback
 from abc import ABCMeta
 from abc import abstractproperty
 from abc import abstractmethod
-from common.util.string_inject_dic import dicToString
+from common.util.string_inject_dic import dic_to_string
 from common.exception.sickle_poc_exception import SicklePocInfoWrong
 from common.exception.sickle_poc_exception import SicklePocOptionsWrong
 
@@ -102,7 +102,7 @@ def main(object):
         exit()
     args = object.help()
     if args.info:
-        print dicToString(object.info)
+        print dic_to_string(object.info)
         exit()
     result = object.verify()
     print result

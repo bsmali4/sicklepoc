@@ -25,7 +25,7 @@ class SicklePoc(base_sickle_poc.BaseSicklePoc):
         self.info = dict(self.info, **temp_info)
 
     def init_options(self):
-        self.options = {'port': 8080, 'host': ''}
+        self.options = {'port': 8080, 'host': '', 'headers': {}, }
 
     def verify(self, use_parser=True):
         result = {}
@@ -34,12 +34,12 @@ class SicklePoc(base_sickle_poc.BaseSicklePoc):
         result['error'] = []
         result['details'] = ""
         result['status'] = False
-        result['details'] = {} #plugin, result
+        result['details'] = {}
         result['pluginname'] = self.info['name']
         args = (use_parser == True and self.help() or argparse.Namespace(target=None, port=None, headers=None))
         target = (args.target == None and self.options['host'] or args.target)
         port = (args.port == None and self.options['port'] or args.port)
-        headers = (args.headers == None and {} or args.headers)
+        headers = (args.headers == None and self.options['headers'] or args.headers)
         if port != 443:
             target = "http://" + target + ":" + str(port)
         else:
@@ -62,7 +62,6 @@ class SicklePoc(base_sickle_poc.BaseSicklePoc):
             if req is not None:
                 req.close()
                 del req
-        self.init_options()
         return result
 
     def help(self):

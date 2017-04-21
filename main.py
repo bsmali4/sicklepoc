@@ -1,6 +1,7 @@
 # coding=utf-8
 import argparse
 import sys
+import json
 sys.path.append("../..")
 from common.taskschedule import task_schedule
 from common.util import load_plugin
@@ -9,6 +10,7 @@ from common.exception.sickle_poc_exception import PluginsError
 from common.exception.sickle_poc_exception import PluginsNotFound
 from common.exception.sickle_poc_exception import LevelError
 from common.exception.sickle_poc_exception import TargetsRepeat
+from common.util.string_inject_dic import string_to_dic
 from plugins import plugin_config
 
 def print_logo():
@@ -46,10 +48,10 @@ def help():
     parser.add_argument("--plugins", required=False, help="插件 eg:zabbix, structs")
     parser.add_argument("--files", required=False, help="扫描目标文件 eg:b5mali4.txt")
     parser.add_argument("--level", type=int, default=1, help = "等级 eg:1-4")
-    parser.add_argument("--options", required=False, help="poc扫描配置, 比如需要提供登录之后的cookie eg:"
-                                                              "{\"Cookie\":\"JSESSIONID=E485B11E73DCB\"}")
+    parser.add_argument("--headers", default="{}", required=False, help="扫描配置,设置http请求头,应对登录情况 eg:"
+                                                              "{\\\"Cookie\\\":\\\"JSESSIONID=E485B11E73DCB\\\"}")
     parser.add_argument("--list", action="store_true", help="列出所有可以利用的插件模块", default=False)
-    parser.add_argument("--debug", default=True, help="debug模式，可以看到扫描详情")
+    parser.add_argument("--debug", default=False, help="debug模式,默认不展示,可以设置为true")
     args = parser.parse_args()
     return args
 
@@ -67,16 +69,25 @@ def get_parserdata(args):
         targets = parser_targets(args)
         plugins = parser_plugins(args)
         level = parser_level(args)
+        headers = parser_headers(args)
     except (TargetsError, PluginsError, LevelError, TargetsRepeat), e:
-        print e
+        print str(e)
         exit()
-    return targets, plugins, level, debug
+    return targets, plugins, level, debug, headers
+
+
+def parser_headers(args):
+    try:
+        result = string_to_dic(args.headers)
+    except ValueError, e:
+        print "{}不是一个有效的格式".format(args.headers)
+    return result
+
 
 
 def parser_debug(args):
-    if args.debug and args.debug == "False":
-        return False
-    return True
+    result = True if args.debug and args.debug == "true" else False
+    return result
 
 
 def parser_level(args):
@@ -107,10 +118,9 @@ def file_list(file_name):
     result = []
     try:
         files = open(file_name)
-        result = files.readlines()
-        result = [str(line).replace("\n","") for line in result]
-    except IOError, e:
-        print str(e)
+        result = [str(line).replace("\n", "") for line in files.readlines()]
+    except IOError:
+        print "{}文件打开失败".format(file_name)
         exit()
     finally:
         if files:
@@ -118,13 +128,14 @@ def file_list(file_name):
             del files
     return result
 
+
 def string_list(string):
     if not isinstance(string, str):
         raise TypeError("string_list函数必须要传入一个str类型的参数")
     temp_strings = string.split(",")
     result_string = []
     for temp_string in temp_strings:
-        if str(temp_string).strip() != "":
+        if str(temp_string).strip() != "" and not result_string.count(str(temp_string).strip()):
             result_string.append(temp_string)
     return result_string
 
@@ -134,9 +145,9 @@ if __name__ == "__main__":
         print "{} -h".format(sys.argv[0])
         exit()
     args = help()
-    targets, plugins, level, debug = get_parserdata(args)
+    targets, plugins, level, debug, headers = get_parserdata(args)
     try:
-        task_schedule.main(targets, load_plugin.load_plugins(plugins), level, debug)
+        task_schedule.main(targets, load_plugin.load_plugins(plugins), level, debug, headers)
     except PluginsNotFound, e:
         print str(e)
         exit()

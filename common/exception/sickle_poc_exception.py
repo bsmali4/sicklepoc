@@ -26,7 +26,7 @@ class TargetsError(Exception):
 
 class PluginsError(Exception):
     def __init__(self):
-        Exception.__init__(self, "请向plugins传入一个数值")
+        Exception.__init__(self, "请向plugins填写一个插件")
 
 
 class PluginsNotFound(Exception):
